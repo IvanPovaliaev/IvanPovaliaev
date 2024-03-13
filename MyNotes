@@ -54,3 +54,5 @@ public class MainClass
         Console.WriteLine("Exit");
     }
 }
+
+https://stackoverflow.com/questions/11726348/is-it-possible-to-declare-a-collection-of-many-generic-delegates-with-different
