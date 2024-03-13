@@ -126,3 +126,70 @@ public class MainClass
         Console.WriteLine("Exit");
     }
 }
+
+Ещё один вариант
+
+using System;
+using System.Collections.Generic;
+
+public static class MainMenu
+{
+    private static int i {get;} = 0;
+    public static List<MenuOption> Options {get;} = new List<MenuOption>
+    {
+        new MenuOption("Начать тест", Delegate.Combine(MainClass.StartTest,MainClass.ShowQuestions)),
+        new MenuOption("Показать результаты", MainClass.ShowResult),
+        new MenuOption("Показать вопросы", MainClass.ShowQuestions),
+        new MenuOption("Выход", MainClass.Exit)
+    };
+}
+
+public class MenuOption
+{
+    public string MenuDescription {get; private set;}
+    public Delegate Option{get; private set;}
+    
+    public MenuOption(string MenuDescription, Delegate Option)
+    {
+        this.MenuDescription = MenuDescription;
+        this.Option = Option;
+    }
+}
+
+public class MainClass
+{
+    public static void Main()
+    {        
+        for (int i = 0; i < MainMenu.Options.Count; i++)
+        {
+            Console.WriteLine($"{i+1}. {MainMenu.Options[i].MenuDescription}");
+            try
+            {
+                MainMenu.Options[i].Option.DynamicInvoke();;
+            }
+            catch
+            {
+                MainMenu.Options[i].Option.DynamicInvoke(4221);
+            }        
+        }
+    }
+    public static void StartTest()
+    {
+        Console.WriteLine("StartTest");
+    }
+    
+    public static void ShowResult(int i)
+    {
+        Console.WriteLine($"ShowResult. Проверка интересно {i}");
+    }
+    
+    public static void ShowQuestions()
+    {
+        Console.WriteLine("ShowQuestions");
+    }
+    
+    public static void Exit()
+    {
+        Console.WriteLine("Exit");
+    }
+}
