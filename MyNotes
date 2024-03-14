@@ -1,195 +1,88 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
-public static class MainMenu
+namespace GeniyIdiotConsoleApp
 {
-    public static List<MenuOption> Options {get;} = new List<MenuOption>
-    {
-        new MenuOption("Начать тест", MainClass.StartTest),
-        new MenuOption("Показать результаты", MainClass.ShowResult),
-        new MenuOption("Показать вопросы", MainClass.ShowQuestions),
-        new MenuOption("Выход", MainClass.Exit)
-    };
-}
-
-public class MenuOption
-{
-    public string MenuDescription {get; private set;}
-    public Action Option{get; private set;}
-    
-    public MenuOption(string MenuDescription, Action Option)
-    {
-        this.MenuDescription = MenuDescription;
-        this.Option = Option;
-    }
-}
-
-public class MainClass
-{
-    public static void Main()
+    internal class Program
     {        
-        for (int i = 0; i < MainMenu.Options.Count; i++)
+        static void Main()
         {
-            Console.WriteLine($"{i+1}. {MainMenu.Options[i].MenuDescription}");
-            MainMenu.Options[i].Option();
+            var user = ConsoleManager.CreateUser();
+            var menuOptions = new List<MenuOption>
+            {
+                new ("Начать тест", ConsoleManager.StartTest),
+                new ("Таблица результатов", () =>
+                    {
+                        ConsoleManager.ShowResults();
+                        Console.WriteLine("\nХотите очистить таблицу результатов? (Введите да/нет)");
+
+                        if (ConsoleManager.GetUserYesOrNoAnswer())
+                        {
+                            UserStorage.ClearUsersResults();
+                            Console.Clear();
+                        }
+                    }),
+                new ("Список вопросов", () =>
+                    {
+                        while(true)
+                        {
+                            ConsoleManager.ShowQuestions();
+                            Console.WriteLine("\nВыберите действие");
+                            var questionsOptions = new List<MenuOption>
+                            {
+                                new ("Добавить свой вопрос", ConsoleManager.AddQuestion),
+                                new ("Удалить вопрос", ConsoleManager.DeleteQuestion),
+                                new ("Вернуться в меню", () => {})
+                            }
+
+                            ConsoleManager
+                                .ShowMenuOptions(questionsOptions.Select(option => option.MenuDescription));
+                            if (ConsoleManager.ChoiceMenuOption(questionOptions) == questionsOptions.Count - 1) break;
+                        }
+                    }),
+                new ("Выход", () => Environment.Exit(0))
+            };
+
+            while (true)
+            {
+                Console.Clear();
+                ConsoleManager.ShowMainMenu(user, menuOptions.Select(option => option.MenuDescription));
+                Console.WriteLine("\nПожалуйста, введите номер пункта, куда хотите перейти");
+
+                ConsoleManager.ChoiceMenuOption(menuOptions);
+
+                var userChoice = ConsoleManager.GetUserInt32Answer(1, menuOptions.Count);
+
+                if (menuOptions[userChoice - 1].Option is Action menuOption)
+                {
+                    menuOption();
+                    continue;
+                }
+                if (menuOptions[userChoice - 1].Option is Action<User> menuOptionUser)
+                {
+                    menuOptionUser(user);
+                    continue;
+                }                
+            }
         }
-    }
-    public static void StartTest()
-    {
-        Console.WriteLine("StartTest");
-    }
-    
-    public static void ShowResult()
-    {
-        Console.WriteLine("ShowResult");
-    }
-    
-    public static void ShowQuestions()
-    {
-        Console.WriteLine("ShowQuestions");
-    }
-    
-    public static void Exit()
-    {
-        Console.WriteLine("Exit");
-    }
-}
-
-https://stackoverflow.com/questions/11726348/is-it-possible-to-declare-a-collection-of-many-generic-delegates-with-different
-
-Второй рабочий вариант
-
-using System;
-using System.Collections.Generic;
-
-public static class MainMenu
-{
-    private static int i {get;} = 0;
-    public static List<MenuOption> Options {get;} = new List<MenuOption>
-    {
-        new MenuOption("Начать тест", (Delegate)MainClass.StartTest),
-        new MenuOption("Показать результаты", (Delegate)MainClass.ShowResult),
-        new MenuOption("Показать вопросы", (Delegate)MainClass.ShowQuestions),
-        new MenuOption("Выход", (Delegate)MainClass.Exit)
-    };
-}
-
-public class MenuOption
-{
-    public string MenuDescription {get; private set;}
-    public Delegate Option{get; private set;}
-    
-    public MenuOption(string MenuDescription, Delegate Option)
-    {
-        this.MenuDescription = MenuDescription;
-        this.Option = Option;
-    }
-}
-
-public class MainClass
-{
-    public static void Main()
-    {        
-        for (int i = 0; i < MainMenu.Options.Count; i++)
+        public static string GetDiagnosis(int countRigthAnswers, int countQuestions)
         {
-            Console.WriteLine($"{i+1}. {MainMenu.Options[i].MenuDescription}");
-            if (MainMenu.Options[i].Option is Action)
-            {
-                ((Action)MainMenu.Options[i].Option)();
-                continue;
-            }
-            if (MainMenu.Options[i].Option is Action<int>)
-            {
-                ((Action<int>)MainMenu.Options[i].Option)(4221);
-                continue;
-            }
-            
+            var diagnoses = new string[6];
+            diagnoses[0] = "Идиот";
+            diagnoses[1] = "Кретин";
+            diagnoses[2] = "Дурак";
+            diagnoses[3] = "Нормальный";
+            diagnoses[4] = "Талант";
+            diagnoses[5] = "Гений";
+
+            var percentRightAnswers = 100 * countRigthAnswers / countQuestions;
+            if (percentRightAnswers < 10) return diagnoses[0];
+            if (percentRightAnswers < 30) return diagnoses[1];
+            if (percentRightAnswers < 50) return diagnoses[2];
+            if (percentRightAnswers < 70) return diagnoses[3];
+            if (percentRightAnswers < 90) return diagnoses[4];
+            return diagnoses[5];
         }
-    }
-    public static void StartTest()
-    {
-        Console.WriteLine("StartTest");
-    }
-    
-    public static void ShowResult(int i)
-    {
-        Console.WriteLine($"ShowResult. Проверка интересно {i}");
-    }
-    
-    public static void ShowQuestions()
-    {
-        Console.WriteLine("ShowQuestions");
-    }
-    
-    public static void Exit()
-    {
-        Console.WriteLine("Exit");
-    }
-}
-
-Ещё один вариант
-
-using System;
-using System.Collections.Generic;
-
-public static class MainMenu
-{
-    private static int i {get;} = 0;
-    public static List<MenuOption> Options {get;} = new List<MenuOption>
-    {
-        new MenuOption("Начать тест", Delegate.Combine(MainClass.StartTest,MainClass.ShowQuestions)),
-        new MenuOption("Показать результаты", MainClass.ShowResult),
-        new MenuOption("Показать вопросы", MainClass.ShowQuestions),
-        new MenuOption("Выход", MainClass.Exit)
-    };
-}
-
-public class MenuOption
-{
-    public string MenuDescription {get; private set;}
-    public Delegate Option{get; private set;}
-    
-    public MenuOption(string MenuDescription, Delegate Option)
-    {
-        this.MenuDescription = MenuDescription;
-        this.Option = Option;
-    }
-}
-
-public class MainClass
-{
-    public static void Main()
-    {        
-        for (int i = 0; i < MainMenu.Options.Count; i++)
-        {
-            Console.WriteLine($"{i+1}. {MainMenu.Options[i].MenuDescription}");
-            try
-            {
-                MainMenu.Options[i].Option.DynamicInvoke();;
-            }
-            catch
-            {
-                MainMenu.Options[i].Option.DynamicInvoke(4221);
-            }        
-        }
-    }
-    public static void StartTest()
-    {
-        Console.WriteLine("StartTest");
-    }
-    
-    public static void ShowResult(int i)
-    {
-        Console.WriteLine($"ShowResult. Проверка интересно {i}");
-    }
-    
-    public static void ShowQuestions()
-    {
-        Console.WriteLine("ShowQuestions");
-    }
-    
-    public static void Exit()
-    {
-        Console.WriteLine("Exit");
     }
 }
