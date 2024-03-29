@@ -58,3 +58,34 @@ for linkInstance in linkInstances:
 
 # Output linked elements
 OUT = linkedElements
+
+
+
+
+
+
+import clr
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+# Get current Revit document
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# Get name of current document
+current_doc_name = doc.Title
+
+# Get names of all linked files
+linked_files_names = []
+linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
+
+for linkInstance in linkInstances:
+    linkDoc = linkInstance.GetLinkDocument()
+    if linkDoc:
+        linked_files_names.append(linkDoc.Title)
+
+# Output names
+OUT = current_doc_name, linked_files_names
