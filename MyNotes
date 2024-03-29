@@ -26,3 +26,35 @@ for linkInstance in linkInstances:
 
 # Output linked elements
 OUT = linkedElements
+
+
+import clr
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# Get active view
+active_view = doc.ActiveView
+
+# Get all instances of RevitLinkInstance
+linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
+
+# List to store elements from linked files
+linkedElements = []
+
+for linkInstance in linkInstances:
+    linkDoc = linkInstance.GetLinkDocument()
+    if linkDoc:
+        # Collect visible elements from linked document
+        collector = FilteredElementCollector(linkDoc, active_view.Id)
+        elements = collector.WhereElementIsNotElementType().ToElements()
+        linkedElements.extend(elements)
+
+# Output linked elements
+OUT = linkedElements
