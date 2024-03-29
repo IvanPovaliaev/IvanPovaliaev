@@ -89,3 +89,45 @@ for linkInstance in linkInstances:
 
 # Output names
 OUT = current_doc_name, linked_files_names
+
+
+import clr
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# Get active view
+active_view = doc.ActiveView
+
+# Define color for elements from linked files
+color = Autodesk.Revit.DB.Color(255, 0, 0)  # Red color example
+
+# Get all instances of RevitLinkInstance
+linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
+
+# Transaction to apply color overrides
+TransactionManager.Instance.EnsureInTransaction(doc)
+
+for linkInstance in linkInstances:
+    linkDoc = linkInstance.GetLinkDocument()
+    if linkDoc:
+        # Collect visible elements from linked document
+        collector = FilteredElementCollector(linkDoc, active_view.Id)
+        elements = collector.WhereElementIsNotElementType().ToElements()
+        
+        # Apply color override to each element
+        for element in elements:
+            OverrideGraphicSettings = Autodesk.Revit.DB.OverrideGraphicSettings()
+            OverrideGraphicSettings.SetProjectionLineColor(color)
+            active_view.SetElementOverrides(element.Id, OverrideGraphicSettings)
+
+TransactionManager.Instance.TransactionTaskDone()
+
+# Output success message
+OUT = "Color override applied to elements from linked files in the active view."
