@@ -1,1 +1,28 @@
-https://docs.google.com/forms/d/e/1FAIpQLSfy8auRT7LypjJEPPpoA_YKndnnBNMMH6CHYXLSMQOzcsID3w/viewform?usp=sf_link
+import clr
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+
+clr.AddReference('RevitAPI')
+import Autodesk
+from Autodesk.Revit.DB import *
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# Get all instances of RevitLinkInstance
+linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
+
+# List to store elements from linked files
+linkedElements = []
+
+for linkInstance in linkInstances:
+    linkDoc = linkInstance.GetLinkDocument()
+    if linkDoc:
+        # Collect elements from linked document
+        collector = FilteredElementCollector(linkDoc)
+        elements = collector.WhereElementIsNotElementType().ToElements()
+        linkedElements.extend(elements)
+
+# Output linked elements
+OUT = linkedElements
