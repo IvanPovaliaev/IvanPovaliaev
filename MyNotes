@@ -13,19 +13,17 @@ def argb_to_color(argb):
     blue = argb & 255
     return Color(red, green, blue)
 
-# Function to get active filters in the active view
-def get_active_filters(active_view):
-    filter_collector = FilteredElementCollector(doc, active_view.Id)
-    return filter_collector.OfClass(ParameterFilterElement).ToElements()
-
 # Get the current Revit document
 doc = DocumentManager.Instance.CurrentDBDocument
 
 # Get the active view
 active_view = doc.ActiveView
 
-# Get active filters
-active_filters = get_active_filters(active_view)
+# Get the ids of active filters in the active view
+active_filter_ids = active_view.GetFilterIds()
+
+# Convert the ids to ParameterFilterElement objects
+active_filters = [doc.GetElement(filter_id) for filter_id in active_filter_ids]
 
 # Input list of ARGB colors
 argb_colors = IN[0]  # ARGB colors input parameter
@@ -50,3 +48,6 @@ for index, color in enumerate(argb_colors):
 
 # Commit the transaction
 TransactionManager.Instance.TransactionTaskDone()
+
+# Output the list of active filters
+OUT = active_filters
