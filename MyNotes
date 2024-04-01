@@ -31,9 +31,10 @@ TransactionManager.Instance.EnsureInTransaction(doc)
 # Modify filter overrides based on input colors
 for index, filter in enumerate(active_filters):
     if index < len(argb_colors):
-        color = argb_to_color(argb_colors[index].Value)
+        color = argb_colors[index]
+        rgb_color = argb_to_color(color.ToArgb())
         overrides = active_view.GetFilterOverrides(filter.Id)
-        overrides.SetForegroundPatternColor(color)
+        overrides.SetForegroundPatternColor(rgb_color)
         active_view.SetFilterOverrides(filter.Id, overrides)
 
 # Commit the transaction
