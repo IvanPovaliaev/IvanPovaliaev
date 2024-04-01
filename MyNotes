@@ -1,234 +1,5 @@
 import clr
 clr.AddReference('RevitServices')
-import RevitServices
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
-
-clr.AddReference('RevitAPI')
-import Autodesk
-from Autodesk.Revit.DB import *
-
-doc = DocumentManager.Instance.CurrentDBDocument
-
-# Get all instances of RevitLinkInstance
-linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
-
-# List to store elements from linked files
-linkedElements = []
-
-for linkInstance in linkInstances:
-    linkDoc = linkInstance.GetLinkDocument()
-    if linkDoc:
-        # Collect elements from linked document
-        collector = FilteredElementCollector(linkDoc)
-        elements = collector.WhereElementIsNotElementType().ToElements()
-        linkedElements.extend(elements)
-
-# Output linked elements
-OUT = linkedElements
-
-
-import clr
-clr.AddReference('RevitServices')
-import RevitServices
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
-
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-
-doc = DocumentManager.Instance.CurrentDBDocument
-
-# Get active view
-active_view = doc.ActiveView
-
-# Get all instances of RevitLinkInstance
-linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
-
-# List to store elements from linked files
-linkedElements = []
-
-for linkInstance in linkInstances:
-    linkDoc = linkInstance.GetLinkDocument()
-    if linkDoc:
-        # Collect visible elements from linked document
-        collector = FilteredElementCollector(linkDoc, active_view.Id)
-        elements = collector.WhereElementIsNotElementType().ToElements()
-        linkedElements.extend(elements)
-
-# Output linked elements
-OUT = linkedElements
-
-
-
-
-
-
-import clr
-clr.AddReference('RevitServices')
-import RevitServices
-from RevitServices.Persistence import DocumentManager
-
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-
-# Get current Revit document
-doc = DocumentManager.Instance.CurrentDBDocument
-
-# Get name of current document
-current_doc_name = doc.Title
-
-# Get names of all linked files
-linked_files_names = []
-linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
-
-for linkInstance in linkInstances:
-    linkDoc = linkInstance.GetLinkDocument()
-    if linkDoc:
-        linked_files_names.append(linkDoc.Title)
-
-# Output names
-OUT = current_doc_name, linked_files_names
-
-
-import clr
-clr.AddReference('RevitServices')
-import RevitServices
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
-
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-
-doc = DocumentManager.Instance.CurrentDBDocument
-
-# Get active view
-active_view = doc.ActiveView
-
-# Define color for elements from linked files
-color = Autodesk.Revit.DB.Color(255, 0, 0)  # Red color example
-
-# Get all instances of RevitLinkInstance
-linkInstances = FilteredElementCollector(doc).OfClass(RevitLinkInstance).ToElements()
-
-# Transaction to apply color overrides
-TransactionManager.Instance.EnsureInTransaction(doc)
-
-for linkInstance in linkInstances:
-    linkDoc = linkInstance.GetLinkDocument()
-    if linkDoc:
-        # Collect visible elements from linked document
-        collector = FilteredElementCollector(linkDoc, active_view.Id)
-        elements = collector.WhereElementIsNotElementType().ToElements()
-        
-        # Apply color override to each element
-        for element in elements:
-            OverrideGraphicSettings = Autodesk.Revit.DB.OverrideGraphicSettings()
-            OverrideGraphicSettings.SetProjectionLineColor(color)
-            active_view.SetElementOverrides(element.Id, OverrideGraphicSettings)
-
-TransactionManager.Instance.TransactionTaskDone()
-
-# Output success message
-OUT = "Color override applied to elements from linked files in the active view."
-
-
-
-
-
-import clr
-clr.AddReference('RevitServices')
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-
-# Function to convert RGB color values to Revit Color
-def rgb_to_color(rgb):
-    return Color(rgb[0], rgb[1], rgb[2])
-
-# Get the current Revit document
-doc = DocumentManager.Instance.CurrentDBDocument
-
-# Get the active view
-active_view = doc.ActiveView
-
-# Get the filters from the active view
-filters = FilteredElementCollector(doc, active_view.Id).OfClass(ParameterFilterElement).ToElements()
-
-# Input array of colors (RGB format)
-color_array = IN[0]  # Colors input parameter
-
-# Start a transaction
-TransactionManager.Instance.EnsureInTransaction(doc)
-
-# Modify filter overrides based on input colors
-for index, f in enumerate(filters):
-    if index < len(color_array):
-        color = rgb_to_color(color_array[index])
-        overrides = active_view.GetFilterOverrides(f.Id)
-        overrides.SetForegroundPatternColor(color)
-        active_view.SetFilterOverrides(f.Id, overrides)
-
-# Commit the transaction
-TransactionManager.Instance.TransactionTaskDone()
-
-# Output the modified filters
-OUT = filters
-
-
-import clr
-clr.AddReference('RevitServices')
-from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
-clr.AddReference('RevitAPI')
-from Autodesk.Revit.DB import *
-
-# Function to convert ARGB color values to RGB
-def argb_to_rgb(argb):
-    a = (argb >> 24) & 255
-    r = (argb >> 16) & 255
-    g = (argb >> 8) & 255
-    b = argb & 255
-    return (r, g, b)
-
-# Function to convert RGB color values to Revit Color
-def rgb_to_color(rgb):
-    return Color(rgb[0], rgb[1], rgb[2])
-
-# Get the current Revit document
-doc = DocumentManager.Instance.CurrentDBDocument
-
-# Get the active view
-active_view = doc.ActiveView
-
-# Get the filters from the active view
-filters = FilteredElementCollector(doc, active_view.Id).OfClass(ParameterFilterElement).ToElements()
-
-# Input list of ARGB colors
-argb_colors = IN[0]  # ARGB colors input parameter
-
-# Convert ARGB colors to RGB
-rgb_colors = [argb_to_rgb(argb) for argb in argb_colors]
-
-# Start a transaction
-TransactionManager.Instance.EnsureInTransaction(doc)
-
-# Modify filter overrides based on input colors
-for index, f in enumerate(filters):
-    if index < len(rgb_colors):
-        color = rgb_to_color(rgb_colors[index])
-        overrides = active_view.GetFilterOverrides(f.Id)
-        overrides.SetForegroundPatternColor(color)
-        active_view.SetFilterOverrides(f.Id, overrides)
-
-# Commit the transaction
-TransactionManager.Instance.TransactionTaskDone()
-
-
-
-import clr
-clr.AddReference('RevitServices')
 from RevitServices.Persistence import DocumentManager
 from RevitServices.Transactions import TransactionManager
 clr.AddReference('RevitAPI')
@@ -249,7 +20,7 @@ doc = DocumentManager.Instance.CurrentDBDocument
 active_view = doc.ActiveView
 
 # Get the filters from the active view
-filters = FilteredElementCollector(doc, active_view.Id).OfClass(ParameterFilterElement).ToElements()
+active_filters = active_view.GetFilters()
 
 # Input list of ARGB colors
 argb_colors = IN[0]  # ARGB colors input parameter
@@ -258,12 +29,12 @@ argb_colors = IN[0]  # ARGB colors input parameter
 TransactionManager.Instance.EnsureInTransaction(doc)
 
 # Modify filter overrides based on input colors
-for index, f in enumerate(filters):
+for index, filter in enumerate(active_filters):
     if index < len(argb_colors):
         color = argb_to_color(argb_colors[index])
-        overrides = active_view.GetFilterOverrides(f.Id)
+        overrides = active_view.GetFilterOverrides(filter.Id)
         overrides.SetForegroundPatternColor(color)
-        active_view.SetFilterOverrides(f.Id, overrides)
+        active_view.SetFilterOverrides(filter.Id, overrides)
 
 # Commit the transaction
 TransactionManager.Instance.TransactionTaskDone()
