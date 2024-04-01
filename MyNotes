@@ -131,3 +131,47 @@ TransactionManager.Instance.TransactionTaskDone()
 
 # Output success message
 OUT = "Color override applied to elements from linked files in the active view."
+
+
+
+
+
+import clr
+clr.AddReference('RevitServices')
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+# Function to convert RGB color values to Revit Color
+def rgb_to_color(rgb):
+    return Color(rgb[0], rgb[1], rgb[2])
+
+# Get the current Revit document
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# Get the active view
+active_view = doc.ActiveView
+
+# Get the filters from the active view
+filters = FilteredElementCollector(doc, active_view.Id).OfClass(ParameterFilterElement).ToElements()
+
+# Input array of colors (RGB format)
+color_array = IN[0]  # Colors input parameter
+
+# Start a transaction
+TransactionManager.Instance.EnsureInTransaction(doc)
+
+# Modify filter overrides based on input colors
+for index, f in enumerate(filters):
+    if index < len(color_array):
+        color = rgb_to_color(color_array[index])
+        overrides = active_view.GetFilterOverrides(f.Id)
+        overrides.SetForegroundPatternColor(color)
+        active_view.SetFilterOverrides(f.Id, overrides)
+
+# Commit the transaction
+TransactionManager.Instance.TransactionTaskDone()
+
+# Output the modified filters
+OUT = filters
