@@ -2,6 +2,7 @@ import clr
 clr.AddReference('RevitServices')
 from RevitServices.Persistence import DocumentManager
 from RevitServices.Transactions import TransactionManager
+from System.Drawing import Color as DrawingColor
 clr.AddReference('RevitAPI')
 from Autodesk.Revit.DB import *
 
@@ -31,16 +32,13 @@ TransactionManager.Instance.EnsureInTransaction(doc)
 # Apply colors to filter overrides based on input colors
 for index, color in enumerate(argb_colors):
     if index < len(filters):
-        # Extract RGB components from ARGB color
-        alpha = (color >> 24) & 255
-        red = (color >> 16) & 255
-        green = (color >> 8) & 255
-        blue = color & 255
-        # Create Revit Color object
-        rgb_color = Color(red, green, blue)
+        # Convert ARGB value to DrawingColor
+        drawing_color = DrawingColor.FromArgb(color)
+        # Convert DrawingColor to Revit Color
+        revit_color = Color(drawing_color.R, drawing_color.G, drawing_color.B)
         filter = filters[index]
         # Set the filter color directly
-        filter.OverrideColor = rgb_color
+        filter.OverrideColor = revit_color
 
 # Commit the transaction
 TransactionManager.Instance.TransactionTaskDone()
