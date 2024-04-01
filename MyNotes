@@ -1,7 +1,6 @@
 import clr
 clr.AddReference('RevitServices')
 from RevitServices.Persistence import DocumentManager
-from RevitServices.Transactions import TransactionManager
 clr.AddReference('RevitAPI')
 from Autodesk.Revit.DB import *
 
@@ -23,11 +22,11 @@ if isinstance(active_view, View3D):
     TransactionManager.Instance.EnsureInTransaction(doc)
     
     # Apply colors to filter hatching based on input colors
-    for index, color in enumerate(argb_colors):
-        if index < len(filters):
+    for index, filter in enumerate(filters):
+        if index < len(argb_colors):
             # Convert ARGB value to Revit Color
+            color = argb_colors[index]
             revit_color = Color(color.Red, color.Green, color.Blue)
-            filter = filters[index]
             # Set the filter color directly
             filter.OverrideColor = revit_color
     
