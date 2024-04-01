@@ -224,3 +224,46 @@ for index, f in enumerate(filters):
 
 # Commit the transaction
 TransactionManager.Instance.TransactionTaskDone()
+
+
+
+import clr
+clr.AddReference('RevitServices')
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+# Function to convert ARGB color values to Revit Color
+def argb_to_color(argb):
+    alpha = (argb >> 24) & 255
+    red = (argb >> 16) & 255
+    green = (argb >> 8) & 255
+    blue = argb & 255
+    return Color(red, green, blue)
+
+# Get the current Revit document
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# Get the active view
+active_view = doc.ActiveView
+
+# Get the filters from the active view
+filters = FilteredElementCollector(doc, active_view.Id).OfClass(ParameterFilterElement).ToElements()
+
+# Input list of ARGB colors
+argb_colors = IN[0]  # ARGB colors input parameter
+
+# Start a transaction
+TransactionManager.Instance.EnsureInTransaction(doc)
+
+# Modify filter overrides based on input colors
+for index, f in enumerate(filters):
+    if index < len(argb_colors):
+        color = argb_to_color(argb_colors[index])
+        overrides = active_view.GetFilterOverrides(f.Id)
+        overrides.SetForegroundPatternColor(color)
+        active_view.SetFilterOverrides(f.Id, overrides)
+
+# Commit the transaction
+TransactionManager.Instance.TransactionTaskDone()
