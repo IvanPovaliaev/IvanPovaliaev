@@ -1,8 +1,17 @@
 import clr
 clr.AddReference('RevitServices')
 from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
 clr.AddReference('RevitAPI')
 from Autodesk.Revit.DB import *
+
+# Function to convert ARGB color values to Revit Color
+def argb_to_color(argb):
+    alpha = (argb >> 24) & 255
+    red = (argb >> 16) & 255
+    green = (argb >> 8) & 255
+    blue = argb & 255
+    return Color(red, green, blue)
 
 # Get the current Revit document
 doc = DocumentManager.Instance.CurrentDBDocument
@@ -13,7 +22,7 @@ active_view = doc.ActiveView
 # Check if the active view is a 3D view
 if isinstance(active_view, View3D):
     # Get the filters associated with the 3D view
-    filters = FilteredElementCollector(doc, active_view.Id).OfClass(ParameterFilterElement).ToElements()
+    filters = IN[1]  # Input list of ParameterFilterElement objects
     
     # Input list of ARGB colors
     argb_colors = IN[0]  # ARGB colors input parameter
@@ -22,11 +31,11 @@ if isinstance(active_view, View3D):
     TransactionManager.Instance.EnsureInTransaction(doc)
     
     # Apply colors to filter hatching based on input colors
-    for index, filter in enumerate(filters):
-        if index < len(argb_colors):
+    for index, color in enumerate(argb_colors):
+        if index < len(filters):
             # Convert ARGB value to Revit Color
-            color = argb_colors[index]
-            revit_color = Color(color.Red, color.Green, color.Blue)
+            revit_color = argb_to_color(color)
+            filter = filters[index]
             # Set the filter color directly
             filter.OverrideColor = revit_color
     
