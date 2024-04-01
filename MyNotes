@@ -19,11 +19,8 @@ doc = DocumentManager.Instance.CurrentDBDocument
 # Get the active view
 active_view = doc.ActiveView
 
-# Get the ids of active filters in the active view
-active_filter_ids = active_view.GetFilterIds()
-
-# Convert the ids to ParameterFilterElement objects
-active_filters = [doc.GetElement(filter_id) for filter_id in active_filter_ids]
+# Get the filters associated with the 3D view
+filters = active_view.GetFilters()
 
 # Input list of ARGB colors
 argb_colors = IN[0]  # ARGB colors input parameter
@@ -31,9 +28,9 @@ argb_colors = IN[0]  # ARGB colors input parameter
 # Start a transaction
 TransactionManager.Instance.EnsureInTransaction(doc)
 
-# Modify filter overrides based on input colors
+# Apply colors to filter overrides based on input colors
 for index, color in enumerate(argb_colors):
-    if index < len(active_filters):
+    if index < len(filters):
         # Extract RGB components from ARGB color
         alpha = (color >> 24) & 255
         red = (color >> 16) & 255
@@ -41,13 +38,12 @@ for index, color in enumerate(argb_colors):
         blue = color & 255
         # Create Revit Color object
         rgb_color = Color(red, green, blue)
-        filter = active_filters[index]
-        overrides = active_view.GetFilterOverrides(filter.Id)
-        overrides.SetForegroundPatternColor(rgb_color)
-        active_view.SetFilterOverrides(filter.Id, overrides)
+        filter = filters[index]
+        # Set the filter color directly
+        filter.OverrideColor = rgb_color
 
 # Commit the transaction
 TransactionManager.Instance.TransactionTaskDone()
 
-# Output the list of active filters
-OUT = active_filters
+# Output the list of filters
+OUT = filters
