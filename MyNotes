@@ -1,1 +1,55 @@
 https://www.fileformat.info/info/unicode/category/So/list.htm
+
+using System;
+using System.Text;
+
+public class MainClass
+{
+    public class ProgressBar
+    {
+        public int Length {get; private set;} //Длина строки прогресса
+        private int currentProgress; //Текущий прогресс
+        public int MaxValue {get; private set;} //Максимальный прогресс
+        private int fillPosition;
+        
+        public ProgressBar()
+        {
+            Length = 10;
+            currentProgress = 0;
+            MaxValue = 100;
+        }
+        
+        public void IncreaseProgresse(int value)
+        {
+            currentProgress += value;
+            fillPosition = currentProgress*Length/MaxValue;
+        }
+        
+        public string GetProgressBar()
+        {
+            var result = new StringBuilder(Length);
+            var fillIndex = currentProgress / MaxValue;
+            
+            for (int i = 0; i < Length; i++)
+            {
+                if (i < fillPosition){
+                    result.Append('\u2588');
+                }
+                else result.Append('\u2591');
+            }
+            return result.ToString();
+        }
+    }
+    
+    public static void Main()
+    {
+        Console.BackgroundColor = ConsoleColor.Yellow;
+        Console.ForegroundColor = ConsoleColor.Black;
+        var s =  new ProgressBar();
+        for (int i =0; i < s.Length; i++)
+        {
+            s.IncreaseProgresse(7);
+            Console.WriteLine(s.GetProgressBar());
+        }
+    }
+}
