@@ -285,4 +285,47 @@ Sub ExportToWordEquation()
     Set wdApp = Nothing
 End Sub
 
+---
+Sub ExportToWordEquation()
+    Dim wdApp As Object
+    Dim wdDoc As Object
+    Dim rng As Range
+    Dim equationText As String
+
+    ' Создаем экземпляр приложения Word
+    Set wdApp = CreateObject("Word.Application")
+    wdApp.Visible = True ' делаем Word видимым
+
+    ' Создаем новый документ Word
+    Set wdDoc = wdApp.Documents.Add
+
+    ' Копируем текст из ячейки A1
+    Set rng = ThisWorkbook.Sheets("Sheet1").Range("A1")
+    equationText = rng.Value
+    
+    ' Вставляем текст в документ Word
+    wdDoc.Range.InsertAfter equationText
+    wdDoc.Range.InsertParagraphAfter ' добавляем разрыв абзаца
+
+    ' Преобразуем в уравнение
+    wdApp.Selection.OMaths.Add wdDoc.Paragraphs(1).Range
+
+    ' Копируем текст из ячейки A2
+    Set rng = ThisWorkbook.Sheets("Sheet1").Range("A2")
+    equationText = rng.Value
+
+    ' Вставляем текст в документ Word
+    wdDoc.Range.InsertAfter equationText
+    wdDoc.Range.InsertParagraphAfter ' добавляем разрыв абзаца
+
+    ' Преобразуем в уравнение
+    wdApp.Selection.OMaths.Add wdDoc.Paragraphs(2).Range
+
+    ' Освобождаем ресурсы
+    Set rng = Nothing
+    Set wdDoc = Nothing
+    Set wdApp = Nothing
+End Sub
+
+
 
