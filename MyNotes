@@ -190,4 +190,38 @@ Sub CopyCellsToWord()
 End Sub
 
 
+Sub CopyCellsToWord()
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim wordRange As Object
+    Dim eq As Object
+    
+    ' Создание экземпляра приложения Word
+    Set wordApp = CreateObject("Word.Application")
+    wordApp.Visible = True ' Сделать Word видимым (по желанию)
+    
+    ' Создание нового документа в Word
+    Set wordDoc = wordApp.Documents.Add
+    
+    ' Создание объекта Range для вставки текста в документ Word
+    Set wordRange = wordDoc.Content
+    
+    ' Вставка содержимого ячейки А1
+    wordRange.InsertAfter Range("A1").Value & vbCrLf
+    
+    ' Вставка содержимого ячейки А2 как уравнение
+    Set eq = wordDoc.OMaths.Add(wordRange)
+    eq.Range.Text = Range("A2").Value
+    
+    ' Вставка содержимого ячейки А3
+    wordRange.InsertAfter Range("A3").Value
+    
+    ' Освобождение ресурсов
+    Set eq = Nothing
+    Set wordRange = Nothing
+    Set wordDoc = Nothing
+    Set wordApp = Nothing
+End Sub
+
+
 
