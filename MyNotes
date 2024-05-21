@@ -327,5 +327,51 @@ Sub ExportToWordEquation()
     Set wdApp = Nothing
 End Sub
 
+---
+
+Sub ExportToWordEquation()
+    Dim wdApp As Object
+    Dim wdDoc As Object
+    Dim equationText As String
+
+    ' Создаем экземпляр приложения Word
+    Set wdApp = CreateObject("Word.Application")
+    wdApp.Visible = True ' делаем Word видимым
+
+    ' Создаем новый документ Word
+    Set wdDoc = wdApp.Documents.Add
+
+    ' Копируем текст из ячейки A1
+    equationText = ThisWorkbook.Sheets("Sheet1").Range("A1").Value
+    
+    ' Вставляем текст в документ Word
+    wdDoc.Range.InsertAfter equationText
+    wdDoc.Range.InsertAfter vbCrLf ' добавляем разрыв абзаца
+
+    ' Преобразуем в уравнение
+    wdApp.Selection.MoveStart Unit:=6 ' wdParagraph
+    wdApp.Selection.MoveEnd Unit:=6
+    wdApp.Selection.OMaths.Add wdApp.Selection.Range
+    wdApp.Selection.MoveRight Unit:=5 ' wdCharacter
+    wdApp.Selection.TypeParagraph ' нажимаем Enter
+
+    ' Копируем текст из ячейки A2
+    equationText = ThisWorkbook.Sheets("Sheet1").Range("A2").Value
+
+    ' Вставляем текст в документ Word
+    wdApp.Selection.TypeText Text:=equationText
+    wdApp.Selection.TypeParagraph ' добавляем разрыв абзаца
+
+    ' Преобразуем в уравнение
+    wdApp.Selection.MoveStart Unit:=6 ' wdParagraph
+    wdApp.Selection.MoveEnd Unit:=6
+    wdApp.Selection.OMaths.Add wdApp.Selection.Range
+    wdApp.Selection.MoveRight Unit:=5 ' wdCharacter
+    wdApp.Selection.TypeParagraph ' нажимаем Enter
+
+    ' Освобождаем ресурсы
+    Set wd
+
+
 
 
