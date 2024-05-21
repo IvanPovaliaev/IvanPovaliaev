@@ -77,8 +77,7 @@ Sub InsertTextAsEquationInWord()
     ' Вставляем текст в документ Word и форматируем его как уравнение
     With wordDoc.Paragraphs(1).Range
         .Text = formulaText
-        .OMaths.Add .Range
-        .OMaths(1).BuildUp
+        .Fields.Add Range:=.Range, Type:=wdFieldEquation, Text:=formulaText
     End With
     
     ' Показываем Word
@@ -88,4 +87,5 @@ Sub InsertTextAsEquationInWord()
     Set wordDoc = Nothing
     Set wordApp = Nothing
 End Sub
+
 
