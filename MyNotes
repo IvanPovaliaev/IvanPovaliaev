@@ -256,5 +256,33 @@ Sub CopyTextToWordEquation()
     Set equation = Nothing
 End Sub
 
+Sub ExportToWordEquation()
+    Dim wdApp As Object
+    Dim wdDoc As Object
+    Dim rng As Range
+    Dim equationText As String
+
+    ' Создаем экземпляр приложения Word
+    Set wdApp = CreateObject("Word.Application")
+    wdApp.Visible = True ' делаем Word видимым
+
+    ' Создаем новый документ Word
+    Set wdDoc = wdApp.Documents.Add
+
+    ' Копируем текст из ячейки А1
+    Set rng = ThisWorkbook.Sheets("Sheet1").Range("A1")
+    equationText = rng.Value
+    
+    ' Вставляем текст в документ Word
+    wdDoc.Range.InsertAfter equationText
+
+    ' Преобразуем в уравнение
+    wdApp.Selection.OMaths.Add wdDoc.Range
+
+    ' Освобождаем ресурсы
+    Set rng = Nothing
+    Set wdDoc = Nothing
+    Set wdApp = Nothing
+End Sub
 
 
