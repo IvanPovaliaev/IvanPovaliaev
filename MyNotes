@@ -147,5 +147,66 @@ Sub ProcessEquation(ByVal eqRange As Range)
     Next i
 End Sub
 
+---
+Sub ExportToWordAsEquation()
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim ws As Worksheet
+    Dim cell As Range
+    Dim eqRange As Object
+    
+    ' Устанавливаем соединение с Word
+    On Error Resume Next
+    Set wordApp = GetObject(class:="Word.Application")
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject(class:="Word.Application")
+    End If
+    On Error GoTo 0
+    wordApp.Visible = True
+    
+    ' Создаем новый документ Word
+    Set wordDoc = wordApp.Documents.Add
+    
+    ' Указываем лист и диапазон ячеек для экспорта
+    Set ws = ThisWorkbook.Sheets("Лист1")
+    
+    ' Перебираем ячейки и добавляем их в уравнения в Word
+    For Each cell In ws.Range("A1:A10") ' Замените диапазон на нужный вам
+        If cell.Value <> "" Then
+            ' Добавляем параграф для уравнения
+            wordDoc.Paragraphs.Add
+            Set eqRange = wordDoc.Paragraphs(wordDoc.Paragraphs.Count).Range
+            eqRange.Text = "=" & cell.Value
+            eqRange.OMaths.Add eqRange
+            ProcessEquation eqRange.OMaths(1).Range
+            eqRange.OMaths(1).BuildUp
+        End If
+    Next cell
+End Sub
+
+Sub ProcessEquation(ByVal eqRange As Range)
+    ' Проходим по каждому символу и создаем уравнение с надстрочными индексами
+    Dim i As Long
+    Dim baseChar As Range
+    Dim expChar As Range
+    
+    For i = 1 To eqRange.Characters.Count
+        If Mid(eqRange.Text, i, 1) = "^" Then
+            ' Создаем надстрочный индекс
+            Set baseChar = eqRange.Characters(i - 1)
+            Set expChar = eqRange.Characters(i + 1)
+            
+            ' Используем встроенную функцию для создания надстрочного индекса
+            With eqRange.OMaths(1).Functions.Add(baseChar, 1) ' 1 соответствует wdOMathFunctionSup
+                .Range.Characters(2).Text = expChar.Text
+            End With
+            
+            ' Удаляем исходные символы "^" и экспоненты
+            expChar.Delete
+            eqRange.Characters(i).Delete
+        End If
+    Next i
+End Sub
+
 
 
