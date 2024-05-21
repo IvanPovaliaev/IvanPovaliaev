@@ -132,5 +132,27 @@ Sub ProcessEquation(eqRange As Object)
     Next i
 End Sub
 
+---
+Sub ConvertToWordEquation()
+    Dim wordApp As Object
+    Dim equationString As String
+    
+    ' Create a new instance of Microsoft Word
+    Set wordApp = CreateObject("Word.Application")
+    wordApp.Visible = True ' Optional: Make Word visible
+    
+    ' Define the equation string
+    equationString = "w^2 + M_y"
+    
+    ' Create a new document in Word
+    wordApp.Documents.Add
+    
+    ' Insert the equation into Word
+    wordApp.Selection.Fields.Add wordApp.Selection.Range, Type:=wdFieldEmpty, Text:=equationString, PreserveFormatting:=True
+    
+    ' Clean up
+    Set wordApp = Nothing
+End Sub
+
 
 
