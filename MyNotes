@@ -54,3 +54,38 @@ public class MainClass
         }
     }
 }
+
+Sub InsertTextAsEquationInWord()
+    Dim wordApp As Object
+    Dim wordDoc As Object
+    Dim formulaText As String
+    
+    ' Получаем текстовое выражение из Excel (например, из ячейки A1)
+    formulaText = ThisWorkbook.Sheets(1).Range("A1").Value
+    
+    ' Создаем экземпляр Word
+    On Error Resume Next
+    Set wordApp = GetObject(, "Word.Application")
+    If Err.Number <> 0 Then
+        Set wordApp = CreateObject("Word.Application")
+    End If
+    On Error GoTo 0
+    
+    ' Создаем новый документ Word
+    Set wordDoc = wordApp.Documents.Add
+    
+    ' Вставляем текст в документ Word и форматируем его как уравнение
+    With wordDoc.Paragraphs(1).Range
+        .Text = formulaText
+        .OMaths.Add .Range
+        .OMaths(1).BuildUp
+    End With
+    
+    ' Показываем Word
+    wordApp.Visible = True
+    
+    ' Освобождаем объекты
+    Set wordDoc = Nothing
+    Set wordApp = Nothing
+End Sub
+
