@@ -373,5 +373,37 @@ Sub ExportToWordEquation()
     Set wd
 
 
+---
+Sub CreateWordEquation()
+    Dim wdApp As Object
+    Dim wdDoc As Object
+    Dim equation As Object
+
+    ' Создаем новый экземпляр Word
+    Set wdApp = CreateObject("Word.Application")
+    wdApp.Visible = True ' Делаем Word видимым
+
+    ' Создаем новый документ в Word
+    Set wdDoc = wdApp.Documents.Add
+
+    ' Добавляем уравнение в Word Equation
+    Set equation = wdDoc.OMaths.Add(wdDoc.Range)
+    equation.BuildUp
+
+    ' Добавляем текст в уравнение
+    equation.OMaths(1).Functions.Add Range:=equation.OMaths(1).Range, _
+    Type:=wdOMathFunctionType.wdOMathFunctionNormal, _
+    Function:=wdOMathFunctionType.wdOMathFunctionSuperscript
+    equation.OMaths(1).Functions.Add Range:=equation.OMaths(1).Range, _
+    Type:=wdOMathFunctionType.wdOMathFunctionNormal, _
+    Function:=wdOMathFunctionType.wdOMathFunctionSum
+
+    ' Освобождаем память, выделенную для объектов
+    Set equation = Nothing
+    Set wdDoc = Nothing
+    Set wdApp = Nothing
+End Sub
+
+
 
 
