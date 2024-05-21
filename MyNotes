@@ -223,5 +223,38 @@ Sub CopyCellsToWord()
     Set wordApp = Nothing
 End Sub
 
+---
+Sub CopyTextToWordEquation()
+    Dim objWord As Object
+    Dim objDoc As Object
+    Dim rng As Range
+    Dim equation As Object
+    
+    ' Создание экземпляра Word
+    Set objWord = CreateObject("Word.Application")
+    objWord.Visible = True
+    
+    ' Создание нового документа в Word
+    Set objDoc = objWord.Documents.Add
+    
+    ' Выбор диапазона ячеек в Excel
+    Set rng = ThisWorkbook.Sheets("Sheet1").Range("A1")
+    
+    ' Копирование текста в буфер обмена
+    rng.Copy
+    
+    ' Вставка текста как формулы в Word
+    objDoc.Range.PasteSpecial DataType:=wdPasteEquation
+    
+    ' Очистка буфера обмена
+    Application.CutCopyMode = False
+    
+    ' Очистка ссылок на объекты
+    Set objDoc = Nothing
+    Set objWord = Nothing
+    Set rng = Nothing
+    Set equation = Nothing
+End Sub
+
 
 
