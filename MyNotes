@@ -55,37 +55,37 @@ public class MainClass
     }
 }
 
-Sub InsertTextAsEquationInWord()
+Sub ExportToWordAsEquation()
     Dim wordApp As Object
     Dim wordDoc As Object
-    Dim formulaText As String
+    Dim ws As Worksheet
+    Dim cell As Range
     
-    ' Получаем текстовое выражение из Excel (например, из ячейки A1)
-    formulaText = ThisWorkbook.Sheets(1).Range("A1").Value
-    
-    ' Создаем экземпляр Word
+    ' Устанавливаем соединение с Word
     On Error Resume Next
-    Set wordApp = GetObject(, "Word.Application")
-    If Err.Number <> 0 Then
-        Set wordApp = CreateObject("Word.Application")
+    Set wordApp = GetObject(class:="Word.Application")
+    If wordApp Is Nothing Then
+        Set wordApp = CreateObject(class:="Word.Application")
     End If
     On Error GoTo 0
+    wordApp.Visible = True
     
     ' Создаем новый документ Word
     Set wordDoc = wordApp.Documents.Add
     
-    ' Вставляем текст в документ Word и форматируем его как уравнение
-    With wordDoc.Paragraphs(1).Range
-        .Text = formulaText
-        .Fields.Add Range:=.Range, Type:=wdFieldEquation, Text:=formulaText
-    End With
+    ' Указываем лист и диапазон ячеек для экспорта
+    Set ws = ThisWorkbook.Sheets("Лист1")
     
-    ' Показываем Word
-    wordApp.Visible = True
-    
-    ' Освобождаем объекты
-    Set wordDoc = Nothing
-    Set wordApp = Nothing
+    ' Перебираем ячейки и добавляем их в уравнения в Word
+    For Each cell In ws.Range("A1:A10") ' Замените диапазон на нужный вам
+        If cell.Value <> "" Then
+            wordDoc.Paragraphs.Add
+            wordDoc.Paragraphs(wordDoc.Paragraphs.Count).Range.Text = "=" & cell.Value
+            wordDoc.Paragraphs(wordDoc.Paragraphs.Count).Range.OMaths.Add wordDoc.Paragraphs(wordDoc.Paragraphs.Count).Range
+            wordDoc.Paragraphs(wordDoc.Paragraphs.Count).Range.OMaths.BuildUp
+        End If
+    Next cell
 End Sub
+
 
 
