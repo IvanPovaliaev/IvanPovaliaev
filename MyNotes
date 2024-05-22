@@ -609,3 +609,27 @@ Sub ConvertToEquation()
     MsgBox "Преобразование завершено!", vbInformation
 End Sub
 
+Sub ConvertToEquation()
+    Dim rng As Range
+    Dim eqText As String
+    Dim wdEquation As OMath
+    
+    ' Проходим по всему тексту
+    For Each rng In ActiveDocument.StoryRanges
+        Do
+            ' Проверяем каждое слово внутри диапазона
+            If InStr(rng.Text, "##") > 0 Then
+                eqText = Replace(rng.Text, "##", "")
+                ' Создаем новый объект OMath
+                Set wdEquation = rng.OMaths.Add(rng)
+                ' Устанавливаем текст уравнения
+                wdEquation.Range.Text = eqText
+            End If
+            ' Переходим к следующему диапазону
+            Set rng = rng.NextStoryRange
+        Loop Until rng Is Nothing
+    Next rng
+    
+    ' Оповещаем пользователя об успешном завершении
+    MsgBox "Преобразование завершено!", vbInformation
+End Sub
