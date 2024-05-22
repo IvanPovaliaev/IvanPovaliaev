@@ -404,6 +404,37 @@ Sub CreateWordEquation()
     Set wdApp = Nothing
 End Sub
 
+---
+Sub ConvertToEquation()
+    Dim rng As Range
+    Dim startPos As Long
+    Dim endPos As Long
+    Dim latexExpression As String
+    Dim formula As String
+
+    ' Search for text enclosed in ##
+    Set rng = ActiveDocument.Content
+    With rng.Find
+        .Text = "##*##"
+        .MatchWildcards = True
+        Do While .Execute
+            startPos = rng.Start + 2 ' Position after first ##
+            endPos = rng.End - 2 ' Position before last ##
+            latexExpression = Mid(rng.Text, 3, Len(rng.Text) - 4)
+
+            ' Replace ##...## with LaTeX equation field
+            rng.Text = ""
+            rng.Collapse Direction:=wdCollapseStart
+            ActiveDocument.OMaths.Add rng
+            Set formula = rng.OMaths(1)
+            formula.Range.Text = latexExpression
+            formula.BuildUp
+
+            ' Move to next instance
+            rng.Collapse Direction:=wdCollapseEnd
+        Loop
+    End With
+End Sub
 
 
 
