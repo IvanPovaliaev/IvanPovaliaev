@@ -817,3 +817,28 @@ Sub ЗаменитьТекст()
     ' Очистка памяти
     Set диапазон = Nothing
 End Sub
+
+Sub ReplaceTextBetweenTags()
+    Dim rng As Range
+    Dim searchText As String
+    Dim replaceText As String
+    
+    ' Установка текста для поиска и замены
+    searchText = "<##"
+    replaceText = "Привет"
+    
+    ' Инициализация диапазона, который охватывает весь текст документа
+    Set rng = ActiveDocument.Range
+    
+    ' Пока есть вхождения искомого текста
+    Do While rng.Find.Execute(findText:=searchText, Forward:=True) = True
+        ' Проверка на наличие закрывающего тега ##
+        If InStr(rng.Text, "##>") > 0 Then
+            ' Замена текста между тегами
+            rng.Text = replaceText
+        End If
+        ' Перемещение к следующему вхождению
+        rng.Collapse Direction:=wdCollapseEnd
+    Loop
+End Sub
+
