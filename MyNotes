@@ -1,39 +1,14 @@
-Sub ЗаменитьФрагменты()
-    Dim doc As Document
-    Dim rng As Range
-    
-    ' Получаем доступ к активному документу Word
-    Set doc = ActiveDocument
-    
-    ' Используем объект Range для прохода по всему тексту документа
-    For Each rng In doc.StoryRanges
-        Do
-            ' Поиск текста, заключенного между "<#" и "#>"
-            With rng.Find
-                .Text = "<#*#>"
-                .MatchWildcards = True
-                Do While .Execute
-                    ' Заменяем найденный фрагмент на "Mommy"
-                    rng.Text = "Mommy"
-                Loop
-            End With
-            ' Переходим к следующей части документа
-            Set rng = rng.NextStoryRange
-        Loop Until rng Is Nothing
-    Next rng
-End Sub
-
 Sub ReplaceTextBetweenTags()
     Dim doc As Document
     Dim rng As Range
     Dim searchText As String
-    Dim replaceText As String
+    Dim startPos As Long
+    Dim endPos As Long
     
     Set doc = ActiveDocument
     Set rng = doc.Content
     
     searchText = "<*>"
-    replaceText = "Mommy"
     
     With rng.Find
         .ClearFormatting
@@ -44,7 +19,13 @@ Sub ReplaceTextBetweenTags()
         .MatchWildcards = True
         
         Do While .Execute
-            rng.Text = replaceText
+            startPos = InStr(rng.Text, "<")
+            endPos = InStr(rng.Text, ">")
+            If startPos > 0 And endPos > startPos Then
+                rng.MoveStart wdCharacter, startPos
+                rng.MoveEnd wdCharacter, endPos - startPos - 1
+                rng.Text = "Mommy"
+            End If
         Loop
     End With
 End Sub
