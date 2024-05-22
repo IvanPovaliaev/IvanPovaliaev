@@ -22,3 +22,29 @@ Sub ЗаменитьФрагменты()
         Loop Until rng Is Nothing
     Next rng
 End Sub
+
+Sub ReplaceTextBetweenTags()
+    Dim doc As Document
+    Dim rng As Range
+    Dim searchText As String
+    Dim replaceText As String
+    
+    Set doc = ActiveDocument
+    Set rng = doc.Content
+    
+    searchText = "<*>"
+    replaceText = "Mommy"
+    
+    With rng.Find
+        .ClearFormatting
+        .Text = searchText
+        .Forward = True
+        .Wrap = wdFindStop
+        .Format = False
+        .MatchWildcards = True
+        
+        Do While .Execute
+            rng.Text = replaceText
+        Loop
+    End With
+End Sub
