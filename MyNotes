@@ -727,3 +727,27 @@ Sub InsertEquationsWithLineNumbers()
     Next i
 End Sub
 
+Sub AddEquations()
+    Dim i As Integer
+    Dim j As Integer
+    Dim doc As Document
+    Dim rng As Range
+    Dim eq As OMath
+
+    ' Получаем активный документ
+    Set doc = ActiveDocument
+
+    ' Проходимся по каждым 10 строкам
+    For i = 1 To doc.Paragraphs.Count Step 10
+        ' Создаем диапазон для текущих 10 строк
+        Set rng = doc.Range(Start:=doc.Paragraphs(i).Range.Start, End:=doc.Paragraphs(i + 9).Range.End)
+
+        ' Вставляем Equation с номером строки
+        For j = 1 To 10
+            Set eq = rng.OMaths.Add(rng)
+            eq.Range.Text = "Equation " & i + j - 1 ' Номер строки
+        Next j
+    Next i
+End Sub
+
+
