@@ -788,4 +788,32 @@ Sub InsertEquation(rng As Range, equationText As String)
     eq.Range.ParagraphFormat.Alignment = wdAlignParagraphCenter
 End Sub
 
+---
+Создай скрипт для word, который:
+В каждой для 10 строк нужно создать Equation с номером этой строки. 
+Используй VBA и OMaths
 
+Sub ЗаменитьТекст()
+    Dim диапазон As Range
+    
+    ' Инициализация переменной диапазона для прохода по всему тексту документа
+    Set диапазон = ActiveDocument.Content
+    
+    ' Проход по всему тексту документа
+    With диапазон.Find
+        .ClearFormatting
+        .Text = "##*##"
+        .Replacement.ClearFormatting
+        .Replacement.Text = "Привет"
+        .Forward = True
+        .Wrap = wdFindContinue
+        
+        ' Выполнение замены
+        Do While .Execute
+            диапазон.Text = "Привет"
+        Loop
+    End With
+    
+    ' Очистка памяти
+    Set диапазон = Nothing
+End Sub
