@@ -568,4 +568,44 @@ Sub ConvertTextToEquation()
     End With
 End Sub
 
+Sub ConvertToEquation()
+    Dim doc As Document
+    Dim rng As Range
+    Dim wdEquation As OMath
+    
+    ' Открываем текущий документ Word
+    Set doc = ActiveDocument
+    
+    ' Указываем диапазон для поиска
+    Set rng = doc.Content
+    
+    ' Проходим по всему тексту
+    With rng.Find
+        .ClearFormatting
+        .Text = "##*##"
+        .Forward = True
+        .Wrap = wdFindStop
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = True
+        .Execute
+        ' Преобразуем каждое найденное слово в уравнение
+        Do While .Found
+            ' Помещаем текст уравнения в OMath
+            Set wdEquation = rng.OMaths.Add(rng)
+            wdEquation.Range.Text = Replace(rng.Text, "##", "")
+            ' Переходим к следующему найденному слову
+            .Execute
+        Loop
+    End With
+    
+    ' Освобождаем память
+    Set doc = Nothing
+    Set rng = Nothing
+    Set wdEquation = Nothing
+    
+    ' Оповещаем пользователя об успешном завершении
+    MsgBox "Преобразование завершено!", vbInformation
+End Sub
 
