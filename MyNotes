@@ -680,3 +680,50 @@ Sub InsertEquationsWithLineNumbers()
         lineCounter = lineCounter + 1
     Next i
 End Sub
+
+
+---
+Sub InsertEquationsWithLineNumbers()
+    Dim doc As Document
+    Dim i As Integer
+    Dim eqCounter As Integer
+    Dim lineCounter As Integer
+    Dim lineNumber As Integer
+    Dim rng As Range
+    Dim equationText As String
+    
+    ' Устанавливаем текущий документ
+    Set doc = ActiveDocument
+    
+    ' Начальные значения счетчиков
+    eqCounter = 1
+    lineCounter = 1
+    
+    ' Проходим по каждому абзацу в документе
+    For i = 1 To doc.Paragraphs.Count
+        ' Если текущая строка является одной из десяти, создаем уравнение с номером строки
+        If lineCounter Mod 10 = 0 Then
+            ' Создаем новую область
+            Set rng = doc.Paragraphs(i).Range
+            rng.Collapse wdCollapseStart
+            
+            ' Получаем номер текущей строки
+            lineNumber = rng.Information(wdFirstCharacterLineNumber)
+            
+            ' Генерируем текст уравнения с номером строки
+            equationText = "y = x + " & lineNumber
+            
+            ' Вставляем уравнение в область
+            rng.OMaths.Add rng
+            rng.OMaths(1).BuildUp equationText
+            rng.InsertAfter vbCrLf
+            
+            ' Увеличиваем счетчик уравнений
+            eqCounter = eqCounter + 1
+        End If
+        
+        ' Увеличиваем счетчик строк
+        lineCounter = lineCounter + 1
+    Next i
+End Sub
+
