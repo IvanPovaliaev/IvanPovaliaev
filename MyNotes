@@ -475,4 +475,45 @@ Sub ConvertToEquation()
     End With
 End Sub
 
+---
+
+Sub ConvertToEquation()
+    Dim rng As Range
+    Dim startPos As Long
+    Dim endPos As Long
+    Dim latexExpression As String
+
+    ' Search for text enclosed in ##
+    Set rng = ActiveDocument.Content
+    With rng.Find
+        .Text = "##*##"
+        .MatchWildcards = True
+        Do While .Execute
+            ' Save positions of the found text
+            startPos = rng.Start + 2 ' Position after first ##
+            endPos = rng.End - 2 ' Position before last ##
+            latexExpression = Mid(rng.Text, 3, Len(rng.Text) - 4)
+            
+            ' Clear the found text
+            rng.Text = ""
+            
+            ' Create a new range for the equation
+            Dim eqRange As Range
+            Set eqRange = ActiveDocument.Range(startPos, startPos)
+            
+            ' Add the LaTeX equation
+            Dim eq As OMath
+            Set eq = ActiveDocument.OMaths.Add(eqRange)
+            eqRange.Text = latexExpression
+            
+            ' Build the equation
+            eq.BuildUp
+            
+            ' Move to next instance
+            rng.Collapse Direction:=wdCollapseEnd
+        Loop
+    End With
+End Sub
+
+
 
