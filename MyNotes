@@ -541,4 +541,31 @@ Sub ConvertTextToEquation()
     End With
 End Sub
 
+Sub ConvertTextToEquation()
+    Dim doc As Document
+    Dim rng As Range
+    Dim eqText As String
+    Dim eq As OMath
+    
+    Set doc = ActiveDocument
+    Set rng = doc.Content
+    
+    With rng.Find
+        .Text = "##*##" ' Поиск текста заключенного между ##
+        .MatchWildcards = True
+        
+        Do While .Execute
+            eqText = rng.Text
+            eqText = Replace(eqText, "##", "") ' Удаление ##
+            
+            ' Создание объекта Equation и вставка вместо текста
+            rng.Text = "" ' Очистка текущего диапазона
+            Set eq = rng.OMaths.Add(rng)
+            eq.Range.Text = eqText ' Вставка текста в уравнение
+            
+            Set rng = doc.Range(rng.End, doc.Content.End) ' Переход к следующему найденному диапазону
+        Loop
+    End With
+End Sub
+
 
