@@ -750,4 +750,42 @@ Sub AddEquations()
     Next i
 End Sub
 
+-+-+-+-
+Sub InsertEquationsWithLineNumbers()
+    Dim doc As Document
+    Dim rng As Range
+    Dim i As Integer
+    
+    ' Определение текущего документа
+    Set doc = ActiveDocument
+    
+    ' Определение начальной области для вставки уравнений
+    Set rng = doc.Range
+    
+    ' Перебор каждой 10 строки в документе
+    For i = 1 To doc.Paragraphs.Count Step 10
+        ' Переход к следующей 10 строке
+        rng.MoveStart wdParagraph, 10
+        
+        ' Вставка уравнения с номером строки
+        InsertEquation rng, "Equation " & i
+    Next i
+End Sub
+
+Sub InsertEquation(rng As Range, equationText As String)
+    Dim eq As OMath
+    
+    ' Вставка пустого объекта OMath в указанную область
+    Set eq = rng.OMaths.Add(rng)
+    
+    ' Добавление текста к объекту OMath
+    eq.Range.Text = equationText
+    
+    ' Установка стиля для объекта OMath
+    eq.Range.OMaths(1).OMaths(1).Type = wdOMathInline
+    
+    ' Установка выравнивания по центру
+    eq.Range.ParagraphFormat.Alignment = wdAlignParagraphCenter
+End Sub
+
 
