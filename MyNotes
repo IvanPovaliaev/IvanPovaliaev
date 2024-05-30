@@ -1,30 +1,56 @@
-Sub ReplaceTextBetweenTags()
+Sub ConvertToEquations()
     Dim doc As Document
-    Dim rng As Range
-    Dim searchText As String
-    Dim startPos As Long
-    Dim endPos As Long
+    Dim startPos As Long, endPos As Long
+    Dim searchRange As Range
+    Dim equationText As String
     
+    ' Указываем активный документ
     Set doc = ActiveDocument
-    Set rng = doc.Content
     
-    searchText = "<*>"
+    ' Начинаем поиск
+    Set searchRange = doc.Content
     
-    With rng.Find
-        .ClearFormatting
-        .Text = searchText
+    ' Ищем "<<"
+    With searchRange.Find
+        .Text = "<<"
         .Forward = True
         .Wrap = wdFindStop
         .Format = False
-        .MatchWildcards = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
         
         Do While .Execute
-            startPos = InStr(rng.Text, "<")
-            endPos = InStr(rng.Text, ">")
-            If startPos > 0 And endPos > startPos Then
-                rng.MoveStart wdCharacter, startPos
-                rng.MoveEnd wdCharacter, endPos - startPos - 1
-                rng.Text = "Mommy"
+            startPos = searchRange.End
+            searchRange.Collapse wdCollapseEnd
+            
+            ' Ищем ">>" после "<<"
+            searchRange.Find.Text = ">>"
+            If searchRange.Find.Execute Then
+                endPos = searchRange.Start
+                searchRange.Collapse wdCollapseStart
+                
+                ' Извлекаем текст между "<<...>>"
+                equationText = Mid(doc.Range(startPos, endPos).Text, 1, Len(doc.Range(startPos, endPos).Text))
+                
+                ' Удаляем "<<...>>"
+                doc.Range(startPos - 2, endPos + 2).Delete
+                
+                ' Вставляем уравнение на место "<<...>>"
+                doc.Range(startPos - 2).InsertParagraphAfter
+                doc.Range(startPos - 2).MoveEnd wdCharacter, 1
+                doc.OMaths.Add doc.Range(startPos - 2).Paragraphs(1).Range
+                doc.Range(startPos - 2).Paragraphs(1).Range.Text = equationText
+                
+                ' Обновляем диапазон для поиска следующего "<<"
+                Set searchRange = doc.Content
+                searchRange.Start = startPos
+                searchRange.End = doc.Content.End
+            Else
+                ' Если ">>" не найден, заканчиваем поиск
+                Exit Do
             End If
         Loop
     End With
