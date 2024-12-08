@@ -9,7 +9,6 @@ I use C# for my projects.
 <h3 align="center">
 
 ![](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=IvanPovaliaev&theme=default)
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=IvanPovaliaev&layout=compact&theme=transparent&show_icons=true)](https://github.com/IvanPovaliaev/github-readme-stats)
 [![GitHub Streak](https://streak-stats.demolab.com/?user=IvanPovaliaev)](https://git.io/streak-stats)
 [![My GitHub stats](https://github-readme-stats.vercel.app/api?username=IvanPovaliaev&theme=transparent&show_icons=true)](https://github.com/IvanPovaliaev/github-readme-stats) </h3>
 
