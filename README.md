@@ -15,7 +15,7 @@ I use C# for my projects.
 <h3 align="center">My skills:
   
   [![My Skills](https://skillicons.dev/icons?i=cs,dotnet,postman,visualstudio,redis&theme=dark&perline=15)](https://skillicons.dev) <img src="https://github.com/user-attachments/assets/79a2e57b-38a2-44ed-b358-1835b787b991" alt="EF Core" width="50" height="50"> <br/>
-  [![My Skills](https://skillicons.dev/icons?i=git,docker,postgresql,html,css&theme=dark&perline=15)](https://skillicons.dev) 
+  [![My Skills](https://skillicons.dev/icons?i=git,docker,postgresql,rabbitmq,html,css&theme=dark&perline=15)](https://skillicons.dev) 
 </h3>
 <!--
 **IvanPovaliaev/IvanPovaliaev** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
